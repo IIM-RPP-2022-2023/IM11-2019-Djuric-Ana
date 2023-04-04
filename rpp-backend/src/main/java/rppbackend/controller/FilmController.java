@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
 import rppbackend.model.Film;
 import rppbackend.service.FilmService;
 
+@CrossOrigin
 @RestController
 public class FilmController {
 	
@@ -28,12 +31,14 @@ public class FilmController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @ApiOperation(value = "Returns List of all Filmovi")
 	@GetMapping("film")
 	public ResponseEntity<List<Film>> getAll(){
 		List<Film> filmovi = filmService.getAll();
         return new ResponseEntity<>(filmovi, HttpStatus.OK);
 	}
 	
+    @ApiOperation(value = "Returns Film with id that was forwarded as path variable.")
 	@GetMapping("film/{id}")
 	public ResponseEntity<Film> getOne(@PathVariable("id") Integer id){
 	    if (filmService.findById(id).isPresent()) {
@@ -44,12 +49,14 @@ public class FilmController {
 	    }
 	}
 	
+    @ApiOperation(value = "Returns list of Filmovi containing string that was forwarded as path variable in 'naziv'.")
 	@GetMapping("film/naziv/{naziv}")
 	public ResponseEntity<List<Film>> getByNaziv(@PathVariable("naziv") String naziv){
 		List<Film> filmovi = filmService.findByNazivContainingIgnoreCase(naziv);
         return new ResponseEntity<>(filmovi, HttpStatus.OK);
 	}
 	
+    @ApiOperation(value = "Adds new Film to database.")
 	@PostMapping("film")
 	public ResponseEntity<Film> addFilm(@RequestBody Film film) {
 		Film savedFilm = filmService.save(film);
@@ -57,6 +64,7 @@ public class FilmController {
 		return ResponseEntity.created(location).body(savedFilm);
 	}
 
+    @ApiOperation(value = "Updates Film that has id that was forwarded as path variable with values forwarded in Request Body.")
     @PutMapping(value = "film/{id}")
     public ResponseEntity<Film> updateFilm(@RequestBody Film film, @PathVariable("id") Integer id) {
         if (filmService.existsById(id)) {
@@ -67,11 +75,12 @@ public class FilmController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 	
+    @ApiOperation(value = "Deletes Film with id that was forwarded as path variable.")
     @DeleteMapping("film/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable Integer id) {
         if (id == -100 && !filmService.existsById(id)) {
             jdbcTemplate.execute(
-            		"INSERT INTO film (\"id\", \"naziv\", \"recenzija\", \"trajanje\", \"zanr\") VALUES (-100, 'Test Naziv', 'Test Recenzija', 'Test Trajanje', 'Test Zanr')");
+            		"INSERT INTO film (\"id\", \"naziv\", \"recenzija\", \"trajanje\", \"zanr\") VALUES ('-100', 'Test Naziv', '10', '100', 'Test Zanr')");
             
         }
 

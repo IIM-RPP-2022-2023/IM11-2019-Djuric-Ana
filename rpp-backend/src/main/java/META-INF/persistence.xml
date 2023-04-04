@@ -3,7 +3,7 @@
 	<persistence-unit name="rpp-backend">
 		<class>rppbackend.model.Bioskop</class>
 		<class>rppbackend.model.Film</class>
-		<class>rppbackend.model.Sala</class>
 		<class>rppbackend.model.Rezervacija</class>
+		<class>rppbackend.model.Sala</class>
 	</persistence-unit>
 </persistence>
